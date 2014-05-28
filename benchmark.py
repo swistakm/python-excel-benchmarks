@@ -159,8 +159,21 @@ def benchmark_xlsxwriter():
     workbook.close()
 
 
+def benchmark_csv():
+    import csv
+
+    with open('benchmark_scv.csv', 'wb') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows([
+            [value for _ in xrange(COLUMNS)]
+            for row, value in izip(xrange(ROWS), VALUES)
+        ])
+
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Excel libs benchmark.')
+    parser = argparse.ArgumentParser(
+        description='Simple benchmark for various Excel/XSLX python libraries'
+    )
     parser.add_argument(
         '--filter', '-f',
         metavar='regex', type=re.compile,
@@ -169,25 +182,46 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        '--repeats', '-r',
+        '--tests', '-t',
         metavar='number', type=int,
         default=10,
-        help='number of test repeats',
+        help='number of test runs',
+    )
+
+    parser.add_argument(
+        '--columns', '-c',
+        metavar='number', type=int,
+        default=100,
+        help='number of test spreadsheed columns',
+    )
+
+    parser.add_argument(
+        '--rows', '-r',
+        metavar='number', type=int,
+        default=1000,
+        help='number of test spreadsheet rows',
     )
 
     args = parser.parse_args()
 
-    for stmt in filter(lambda fun: args.filter.search(fun.__name__),
-                       get_benchmarks()):
+    for stmt in sorted(filter(lambda fun: args.filter.search(fun.__name__),
+                              get_benchmarks()),
+                       key=lambda fun: fun.__name__):
         if hasattr(stmt, 'skip'):
             print("# SKIP {0} ({1})".format(stmt.__name__, stmt.skip))
             continue
 
+        # do it globally to simplify test running and avoid
+        # passing parameters to benchmark_function
+        # (timeit - I hate you!)
+        COLUMNS = args.columns
+        ROWS = args.rows
+
         timer = timeit.Timer(stmt, 'gc.enable()')
         try:
-            result = timer.timeit(number=args.repeats)
+            result = timer.timeit(number=args.tests)
         except ImportError, err:
             print("# SKIP {0} ({1})".format(stmt.__name__, err))
             continue
 
-        print("{0:30} {1:5f}".format(stmt.__name__, result/args.repeats,))
+        print("{0:30} {1:5f}".format(stmt.__name__, result/args.tests,))
