@@ -90,7 +90,7 @@ def benchmark_openpyxl_rows():
     for row, value in izip(xrange(1, ROWS + 1), VALUES):
         sheet.append([str(value) for _ in xrange(1, COLUMNS + 1)])
 
-    workbook.save('benchmark_openpyxl_rows.xslx')
+    workbook.save('benchmark_openpyxl_rows.xlsx')
 
 
 def benchmark_openpyxl():
@@ -107,7 +107,7 @@ def benchmark_openpyxl():
         for column in xrange(1, COLUMNS + 1):
             sheet.cell('%s%s' % (get_column_letter(column), row)).value = value
 
-    workbook.save('benchmark_openpyxl.xslx')
+    workbook.save('benchmark_openpyxl.xlsx')
 
 
 def benchmark_pyexcelerate():
@@ -172,7 +172,7 @@ def benchmark_csv():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='Simple benchmark for various Excel/XSLX python libraries'
+        description='Simple benchmark for various Excel/XLSX python libraries'
     )
     parser.add_argument(
         '--filter', '-f',

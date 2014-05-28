@@ -41,6 +41,7 @@ coverage.xml
 .idea
 
 
-# Excel files
-.xls
-.xlsx
+# Benchmark output files files
+*.xls
+*.xlsx
+*.csv
